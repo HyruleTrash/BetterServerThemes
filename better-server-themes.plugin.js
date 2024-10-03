@@ -1,7 +1,10 @@
 /**
  * @name BetterServerThemes
  * @author TrashElf
+ * @authorId 439831387223228417
  * @description Changes your theme depending on the server you are in.
+ * @source https://github.com/HyruleTrash/BetterServerThemes
+ * @updateUrl https://raw.githubusercontent.com/HyruleTrash/BetterServerThemes/refs/heads/main/better-server-themes.plugin.js
  * @version 0.0.1
  */
 
