@@ -80,6 +80,9 @@ module.exports = class BetterServerThemes {
             this.serverIconsObserver.disconnect();
             this.serverIconsObserver = null;
         }
+
+        // empty settings
+        this.settings = null;
     }
 
     // This function is called by the start function, to get the current server name that the user is in
@@ -101,6 +104,8 @@ module.exports = class BetterServerThemes {
             this.currentServer = foundServerName;
 
             this.settings = BdApi.Data.load("BetterServerThemes", "settings");
+            this.setServerDefaultValues(this.currentServer);
+            this.setServerDefaultValues("default");
             if (this.settings[this.currentServer]) {
                 this.updateThemes(this.currentServer);
             }else if (this.settings["default"]) {
@@ -145,8 +150,30 @@ module.exports = class BetterServerThemes {
                 this.knownServers.push({name:element.getAttribute('data-dnd-name'), id:0});
             }
         }
+
+        this.updateSettingsWithDefaultValues();
     }
     
+    updateSettingsWithDefaultValues() {
+        this.knownServers.forEach(server => {
+            this.setServerDefaultValues(server.name);
+        })
+        this.setServerDefaultValues("default");
+    }
+
+    setServerDefaultValues(server){
+        if (!this.settings){
+            this.settings = {};
+        }
+        if (!this.settings.hasOwnProperty(server)){
+            let themes = BdApi.Themes.getAll();
+            this.settings[server] = {};
+            themes.forEach(theme => {
+                this.settings[server][theme.name] = false;
+            })
+        }
+    }
+
     // a function to render the server list in the settings panel
     renderServerList() {
         let ul = document.createElement("ul");
@@ -204,7 +231,7 @@ module.exports = class BetterServerThemes {
         dropdown.classList = "dropdown-menu-better-server-themes dropdown-menu-better-server-themes-closed";
         dropdown.setAttribute("aria-labelledby", "dropdownMenuButton"+server.id);
         li.appendChild(dropdown);
-
+        
         themes.forEach(theme => {
             dropdown.appendChild(this.renderThemeListItem(theme.name, server.id, this.settings[server.name][theme.name]));
         });
@@ -248,6 +275,10 @@ module.exports = class BetterServerThemes {
         } catch (error) {
             console.error(error);
         }
+        if(!this.settings){
+            this.updateSettingsWithDefaultValues();
+        }
+        
 
         // add bootstrap
         let link = document.createElement("link");
